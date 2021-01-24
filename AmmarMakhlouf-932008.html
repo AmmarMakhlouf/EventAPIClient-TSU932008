@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<style>
+.content {
+  max-width: 700px;
+  margin: auto;
+}
+</style>
+<head>
+	<title>API client Page</title>
+	<meta name="author" content="Ammar Mak">
+</head>
+<body class="content">
+<div>
+<h1 id="title">Data </h1>
+</div>
+<input type="text" id="searchText" name="searchText" placeholder="Search city" value="">
+<button type="button" onclick = "getDataFromURL()" id="button">Search</button>
+<input type="hidden" id="data" name="data" value="">
+<table id="table" cellspacing="1" cellpadding="1" border="1" >
+<tr>
+	<th>#</th>
+    <th>Country</th>
+    <th>City</th>
+    <th>Address</th>
+    <th>Subject</th>
+  </tr>
+</table>
+</body>
+
+<script>
+function httpGet(theUrl)
+{
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open( "GET", theUrl, false );
+    xmlHttp.send( null );
+    return xmlHttp.responseText;
+}
+
+function getDataFromURL()
+{
+  var st = document.getElementById("searchText");
+  const url='https://api.fda.gov/food/enforcement.json?limit=50';
+  var urlget = httpGet(url);
+  var data = JSON.parse(urlget)['results'];
+
+  var table = document.getElementById("table");
+  var title = document.getElementById("title");
+  if(st.value !="")
+	title.innerHTML = "Search Results of " + st.value;
+	else
+	title.innerHTML = "All data ";
+  
+  var counter = 1;
+  while (table.rows.length > 1) {
+	table.deleteRow(1);
+	}
+	
+  
+  for (var element of  data) {
+  
+  var cityString = "In " + element["city"] + " ";
+  if(cityString.includes(""+st.value+ "") == true)
+	 {
+	 row = table.insertRow();
+	//Counter
+	var cell0 = row.insertCell();
+	cell0.innerHTML = ""+counter;
+    var cell1 = row.insertCell();
+    cell1.innerHTML = element["country"];
+	var cell2 = row.insertCell();
+    cell2.innerHTML = element["city"];
+	var cell3 = row.insertCell();
+    cell3.innerHTML = element["address_1"];
+	var cell4 = row.insertCell();
+    cell4.innerHTML = element["reason_for_recall"];
+	if(counter <= 200)
+	row = table.insertRow();
+	counter++;
+	}	
+  }
+}
+</script>
+</html>
